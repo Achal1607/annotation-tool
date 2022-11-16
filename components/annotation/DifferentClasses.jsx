@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import { COLORS_ARRAY } from "../../constants";
-import { useAppContext } from "../../lib/AppContext";
-import { plotPoints, undo } from "../../utils";
 import ClassBox from "./ClassBox";
 
-function DifferentClasses({ datasetName }) {
+function DifferentClasses({ datasetName, activeClass, setActiveClass, allClasses, setAllClasses, config, setConfig, pointsData, setPointsData }) {
   const [newClassName, setNewClassName] = useState('');
-  const { activeClass, setActiveClass, allClasses, setAllClasses, config, setConfig } = useAppContext();
 
   const handleAddClass = () => {
     if (!newClassName.trim().length) return;
@@ -35,7 +32,15 @@ function DifferentClasses({ datasetName }) {
         <div className="font-bold text-xl mb-2">Annotation Classes</div>
         {allClasses.length === 0 ? <ClassBox isNone={true} /> :
           allClasses.map(annotationClass =>
-            <ClassBox key={annotationClass.name} isNone={false} annotationClass={annotationClass} />)}
+            <ClassBox key={annotationClass.name} isNone={false}
+              annotationClass={annotationClass}
+              activeClass={activeClass}
+              pointsData={pointsData}
+              setPointsData={setPointsData}
+              config={config}
+              setActiveClass={setActiveClass}
+              allClasses={allClasses}
+              setAllClasses={setAllClasses} />)}
 
         <p className="text-gray-700 text-base bg-sky-500 rounded px-3 py-1 font-semibold">
           <input type='text'

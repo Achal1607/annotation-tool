@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { useAppContext } from "../../lib/AppContext";
 import { plotPoints } from "../../utils";
 
-function ClassBox({ annotationClass, isNone }) {
+function ClassBox({ annotationClass, isNone, activeClass, allClasses, setAllClasses, setActiveClass, pointsData, setPointsData, config }) {
     const [deleteClass, setDeleteClass] = useState('');
-    const { activeClass, allClasses, setAllClasses, setActiveClass, pointsData, setPointsData, config } = useAppContext();
 
     const handleSure = () => {
         const updatedClasses = allClasses.filter(allClass => allClass.name !== annotationClass.name);

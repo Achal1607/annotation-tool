@@ -12,7 +12,7 @@ export default function Dataset({ data }) {
       </Head>
       <main>
         <Navbar />
-        <DatasetImagesList datasets={data.datasets} />
+        <DatasetImagesList datasets={data.datasets} type={'output'}/>
       </main>
     </div>
   );
@@ -20,9 +20,8 @@ export default function Dataset({ data }) {
 
 export const getServerSideProps = async () => {
   const baseUrl = `${process.env.BASE_URL}:${process.env.PORT}`;
-  const res = await fetch(`${baseUrl}/api/dataset`);
-  const  datasets = await res.json();
-
+  const res = await fetch(`${baseUrl}/api/dataset?type=output`);
+  const datasets = await res.json();
   return {
     props: { data: datasets },
   };

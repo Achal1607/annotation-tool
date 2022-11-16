@@ -3,18 +3,39 @@ import { promises as fs } from "fs";
 
 export default async function handler(req, res) {
   try {
-    const inputPath = path.join(process.cwd(), `public/input`);
+    const { type } = req.query;
+    const datasetsPath = path.join(process.cwd(), `public/${type}`);
 
-    const datasets = await fs.readdir(inputPath);
+    const datasets = await fs.readdir(datasetsPath);
 
-    const result = [];
+    const files = [];
     for await (const dataset of datasets) {
-      const datasetPath = path.join(process.cwd(), `public/input/${dataset}`);
+      const datasetPath = path.join(process.cwd(), `public/${type}/${dataset}`);
       const images = await fs.readdir(datasetPath);
-      const profileUrl = path.join(`/input/${dataset}`, images[0]);
 
-      result.push({ name: dataset, numOfImg: images.length, profileUrl });
+      files.push({
+        name: dataset,
+        numOfImg: images.length,
+        images,
+      });
     }
+    const result = files.map((dataset) => {
+      
+      let images = dataset.images.filter(
+        (image) => image.split(".").pop() !== "json"
+      );
+
+      images = images.filter((image) => {
+        let temp = image.split(".").slice(0, -1).join(".");
+        return temp.split("_").pop() !== "mask";
+      });
+
+      return {
+        name: dataset.name,
+        numOfImg: images.length,
+        profileUrl: path.join(`/${type}/${dataset.name}`, images[0]),
+      };
+    });
 
     res.status(200).json({ datasets: result });
   } catch (err) {

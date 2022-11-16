@@ -3,9 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../lib/AppContext";
 
-function AnnotateImage({ datasetName, imageName }) {
+function AnnotateImage({ datasetName, imageName, activeClass, pointsData, setPointsData, setConfig, config }) {
   const [url, setUrl] = useState("");
-  const { activeClass, pointsData, setPointsData, setConfig, config } = useAppContext();
 
   useEffect(() => {
     setUrl(`/input/${datasetName}/${imageName}`);
@@ -59,12 +58,12 @@ function AnnotateImage({ datasetName, imageName }) {
   };
 
   return (
-      <canvas
-        id={config.canvasName}
-        className="cursor-pointer"
-        style={{ background: `url('${url}')` }}
-        onClick={handleClick}
-      />
+    <canvas
+      id={config.canvasName}
+      className="cursor-pointer"
+      style={{ background: `url('${url}')` }}
+      onClick={handleClick}
+    />
   );
 }
 

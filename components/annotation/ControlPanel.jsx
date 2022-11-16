@@ -1,11 +1,11 @@
 import axios from 'axios';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
-import { useAppContext } from '../../lib/AppContext';
-import { createOutputJson, downloadCanvas, plotOutputMask, plotPoints, undo } from '../../utils';
+import { createOutputJson, plotOutputMask, plotPoints, undo } from '../../utils';
 
-function ControlPanel({ imageName, datasetName }) {
-    const { config, setConfig, setPointsData, pointsData } = useAppContext();
+function ControlPanel({ imageName, datasetName, config, setConfig, setPointsData, pointsData }) {
     const [markerSize, setMarkerSize] = useState(5);
+    const router=useRouter();
 
     useEffect(() => { setMarkerSize(config.pointSize) }, [config.pointSize, markerSize, setMarkerSize]);
 
@@ -43,7 +43,10 @@ function ControlPanel({ imageName, datasetName }) {
 
         const imgBase64 = dataURL.replace('data:', '').replace(/^.+,/, '');
         const res = await axios.post(`/api/output?datasetName=${datasetName}&imageName=${imageName}`, { imgBase64, outputJson, imageName, datasetName })
-        console.log(res);
+        if (res.status === 200) {
+            router.push(`/output/${datasetName.trim()}`);
+        }
+
     }
 
     return (

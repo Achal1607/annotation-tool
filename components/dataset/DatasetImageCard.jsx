@@ -2,12 +2,12 @@
 import { useRouter } from 'next/router'
 import React from 'react'
 
-const DatasetImageCard = ({ dataset }) => {
+const DatasetImageCard = ({ dataset, type }) => {
     const router = useRouter()
     const { profileUrl, name, numOfImg } = dataset;
 
     const handleOnClick = () => {
-        router.push(`/input/${name}`);
+        router.push(`/${type}/${name}`);
     }
 
     return (
