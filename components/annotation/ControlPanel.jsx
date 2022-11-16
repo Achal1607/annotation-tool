@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../../lib/AppContext';
 import { createOutputJson, downloadCanvas, plotOutputMask, plotPoints, undo } from '../../utils';
@@ -38,20 +39,11 @@ function ControlPanel({ imageName, datasetName }) {
 
         plotOutputMask(pointsData, pointSize, ctx, scaleFactor);
         const outputJson = createOutputJson(pointsData, scaleFactor);
-        // canvas.toBlob(async blob => {
-        //     const formData = new FormData(); 
-        //     formData.append("segmentMask", blob);
-        //     formData.append("outputJson",outputJson);
-        //     formData.append("datasetName",datasetName);
-        //     formData.append("imageName",imageName);
-        //     const res = await fetch('/api/output', {
-        //         method: 'POST',
-        //         body: formData
-        //     })
-        //     const status = await res.json();
-        //     console.log(status);
-        // }, "image/jpeg", 1.0);
-        downloadCanvas(imageName, canvas);
+        const dataURL = canvas.toDataURL("image/jpeg", 1.0);
+
+        const imgBase64 = dataURL.replace('data:', '').replace(/^.+,/, '');
+        const res = await axios.post(`/api/output?datasetName=${datasetName}&imageName=${imageName}`, { imgBase64, outputJson, imageName, datasetName })
+        console.log(res);
     }
 
     return (

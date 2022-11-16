@@ -1,40 +1,53 @@
 import path from "path";
-import { promises as fs } from "fs";
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+import fs from "fs";
 
 export default async function handler(req, res) {
   try {
-    console.log(req.body);
+    //Extract params
+    const { outputJson, imgBase64, imageName, datasetName } = req.body;
 
-    console.log(req)
-    const { datasetName, segmentMask, outputJson, imageName } = req.body;
-console.log(datasetName,outputJson,imageName);
+    // Output dir path
     const outputPath = path.join(process.cwd(), `public/output/${datasetName}`);
-    const inputImagePath=path.join(process.cwd(),`public/input/${datasetName}/${imageName}.jpeg`)
-    const outputImageName=`${imageName}_mask`;
-    console.log(outputJson);
-    await fs.writeFile(`${outputPath}/${imageName}.json`,outputJson);
-    
-    const imageBuffer = segmentMask;
-    
-    await fs.createWriteStream(`${outputPath}/${outputImageName}`).write(imageBuffer);
-    
-    await fs.rename(inputImagePath, outputPath, function (err) {
-      if (err) {
-          throw err
-      } else {
-          console.log("Successfully moved the file!");
-      }
-  });
+    if (!fs.existsSync(outputPath)) {
+      fs.mkdirSync(outputPath);
+    }
+    const outputImageName = `${imageName
+      .split(".")
+      .slice(0, -1)
+      .join(".")}_mask.${imageName.split(".").pop()}`;
 
-    res.status(200).json({ message: "successfully annotated" });
+    const inputImagePath = path.join(
+      process.cwd(),
+      `public/input/${datasetName}/${imageName}`
+    );
+
+    //Write output files
+    fs.writeFile(
+      `${outputPath}/${outputImageName}`,
+      imgBase64,
+      "base64",
+      (err) => {
+        throw err;
+      }
+    );
+
+    fs.writeFile(
+      `${outputPath}/${imageName.split(".").slice(0, -1).join(".")}.json`,
+      outputJson,
+      "utf8",
+      (err) => {
+        throw err;
+      }
+    );
+
+    fs.rename(inputImagePath, `${outputPath}/${imageName}`, (err) => {
+      throw err;
+    });
+
+    res
+      .status(200)
+      .json({ message: `successfully saved to output folder ${datasetName}` });
   } catch (err) {
-    console.log(err);
     res.status(500).json(err);
   }
 }
